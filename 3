@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <title> bacılar xox'te </title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 40px;
+    }
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-gap: 5px;
+      justify-content: center;
+    }
+    .cell {
+      width: 100px;
+      height: 100px;
+      background-color: #f0f0f0;
+      border: 2px solid #ccc;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .cell img {
+      width: 90%;
+      height: 90%;
+      object-fit: contain;
+    }
+    .status {
+      margin-top: 20px;
+      font-size: 1.2rem;
+    }
+    .reset {
+      margin-top: 10px;
+      padding: 10px 20px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>bacılar xox'te</h1>
+  <div class="board" id="board"></div>
+  <div class="status" id="status">Sıra: X</div>
+  <button class="reset" onclick="resetGame()">Yeniden Başlat</button>
+
+  <script>
+    const board = document.getElementById('board');
+    const statusText = document.getElementById('status');
+    let currentPlayer = 'X';
+    let gameActive = true;
+    let cells = Array(9).fill(null);
+
+    const xImage = 'https://rebrand.ly/kih0bid';
+    const oImage = 'https://rebrand.ly/otr3vuo';
+
+    const winConditions = [
+      [0,1,2],[3,4,5],[6,7,8],
+      [0,3,6],[1,4,7],[2,5,8],
+      [0,4,8],[2,4,6]
+    ];
+
+    function createBoard() {
+      board.innerHTML = '';
+      cells.forEach((cell, index) => {
+        const cellElement = document.createElement('div');
+        cellElement.classList.add('cell');
+        cellElement.dataset.index = index;
+        cellElement.addEventListener('click', handleClick);
+        board.appendChild(cellElement);
+      });
+    }
+
+    function handleClick(e) {
+      const index = e.target.dataset.index;
+      if (!gameActive || cells[index]) return;
+
+      cells[index] = currentPlayer;
+
+      const img = document.createElement('img');
+      img.src = currentPlayer === 'X' ? xImage : oImage;
+      e.target.appendChild(img);
+
+      if (checkWin()) {
+        statusText.textContent = `${currentPlayer} kazandı!`;
+        gameActive = false;
+      } else if (cells.every(cell => cell)) {
+        statusText.textContent = "Berabere!";
+        gameActive = false;
+      } else {
+        currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+        statusText.textContent = `Sıra: ${currentPlayer}`;
+      }
+    }
+
+    function checkWin() {
+      return winConditions.some(([a, b, c]) => {
+        return cells[a] && cells[a] === cells[b] && cells[a] === cells[c];
+      });
+    }
+
+    function resetGame() {
+      cells = Array(9).fill(null);
+      currentPlayer = 'X';
+      gameActive = true;
+      statusText.textContent = "Sıra: X";
+      createBoard();
+    }
+
+    createBoard();
+  </script>
+</body>
+</html>
